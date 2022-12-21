@@ -1,0 +1,31 @@
+name: HelloWorldApp
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: [self-hosted, Linux, x64, AEM]
+    steps:  
+      - name: checkout repo content
+        uses: actions/checkout@v1
+        
+      - name: Setup local maven cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: checkstyle-maven-cache-${{ hashFiles('**/pom.xml') }}
+        
+      - name: Testing Java 
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          overwrite-settings: false    
+          cache: 'maven'
+          
+      - name: Build with Maven
+        run: ./mvnw clean package -s settings.xml --file pom.xml   
+
+      - run: |
+          java -version
+
